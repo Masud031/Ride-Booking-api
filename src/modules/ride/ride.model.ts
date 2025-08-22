@@ -6,7 +6,8 @@ export type RideStatus =
   | 'picked_up'
   | 'in_transit'
   | 'completed'
-  | 'cancelled';
+  | 'cancelled'
+  |'rejected'
 
 const rideSchema = new Schema(
   {
@@ -18,17 +19,21 @@ driver: {
 },
     pickupLocation: { type: String, required: true },
     destination: { type: String, required: true },
+     fare: { type: Number, required: true, default: 0 },
     status: {
       type: String,
-      enum: ['pending', 'accepted', 'picked_up', 'in_transit', 'completed', 'cancelled'],
-      default: 'pending',
+      enum: ['requested', 'accepted', 'picked_up', 'in_transit', 'completed', 'cancelled','rejected'],
+      default: 'requested',
     },
+    
+     completedAt: { type: Date },
      timestamps: {
       type: Object,
       default: {}, // 👈 ensures timestamps object always exists
     },
   },
-  { timestamps: true }
+  { timestamps: true },
+
 );
 
 export const Ride = model('Ride', rideSchema);

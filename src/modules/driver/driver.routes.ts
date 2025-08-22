@@ -1,19 +1,23 @@
 // src/modules/driver/driver.routes.ts
 import { Router } from 'express';
-import { getAllDrivers, getDriverById, approveDriver, suspendDriver } from './driver.controller';
+import { acceptRide, completeRide, getAvailableRides, getDriverById, getDriverEarnings, rejectRide, startRide, updateRideStatus } from './driver.controller';
+import { authenticate, authorize } from '../auth/auth.controller';
+// import { authorize } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
-// Get all drivers
-router.get('/', getAllDrivers);
+router.get('/available',authenticate,  authorize('driver'),getAvailableRides);
 
-// Get a single driver by ID
-router.get('/:id', getDriverById);
+// View driver earnings (Driver only)
+router.get('/earnings', authenticate, authorize("driver"), getDriverEarnings);
 
-// Approve a driver
-router.put('/:id/approve', approveDriver);
+router.patch('/:id/status', authenticate, authorize('driver'), updateRideStatus);
 
-// Suspend a driver
-router.put('/:id/suspend', suspendDriver);
+// Get a single driver by ID (Admin or Driver himself)
+router.get('/:id', authenticate, authorize("admin", "driver"), getDriverById);
+router.patch('/:id/accept', authenticate,authorize('driver'),acceptRide);
+router.patch('/:id/reject', authenticate,authorize('driver'),rejectRide);
+router.patch( '/:id/start',  authenticate, authorize('driver'),startRide);
+router.patch( '/:id/complete',authenticate,authorize('driver'), completeRide);
 
 export default router;

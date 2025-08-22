@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/modules/driver/driver.model.ts
 import mongoose, { Schema, Document } from 'mongoose';
 
@@ -6,14 +7,14 @@ export interface IDriver extends Document {
   name: string;
   email: string;
   status: 'active' | 'suspended' | 'approved';
-  // Other fields specific to driver, e.g., license info, etc.
+  availability: any;
 }
 
 const driverSchema = new Schema<IDriver>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   status: { type: String, default: 'active', enum: ['active', 'suspended', 'approved'] },
-  // You can add more fields like license number, etc.
+ availability: { type: Boolean, default: true },
 }, { timestamps: true });
 
 // Driver Model

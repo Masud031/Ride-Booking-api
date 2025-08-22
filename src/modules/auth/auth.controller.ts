@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../user/user.model';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+
 
 // Middleware to authenticate JWT token and attach user info to request
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  const JWT_SECRET = process.env.JWT_SECRET as string;
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token provided' });
 
@@ -64,7 +68,7 @@ export const login = async (req: Request, res: Response) => {
       const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET as string,
-      { expiresIn: '7d' }
+      { expiresIn: '250d' }
     );
 
     return res.status(200).json({ token, user });
@@ -77,3 +81,13 @@ export const login = async (req: Request, res: Response) => {
 }
 
 };
+
+export const authorize =
+  (...roles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const userRole = (req.user as any)?.role;
+    if (!roles.includes(userRole)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    next();
+  };
